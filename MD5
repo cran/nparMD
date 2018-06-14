@@ -1,0 +1,12 @@
+58e99274ff779895e10da7de75fa6f34 *DESCRIPTION
+410df6401eda2f041a0fd59b27dbe1be *NAMESPACE
+7d029ec1a88b02e288f3c578ebed8547 *R/nparml.R
+0fd7b5db4f4849c3f894ebfda66d053b *R/nparms.R
+c0878cda19d46df3e67d1450e39b82c8 *R/pseudostudy1.R
+3f8b5534b58848243cd2ac7cd29a145e *R/pseudostudy2.R
+e6baa018e527ed087d252693b897fd4a *data/pseudostudy1.rda
+fa52f79fb2978fe7d9cf83ddb34db693 *data/pseudostudy2.rda
+05ac1f26ba0e3b50cff28cf6738c7280 *man/nparml.Rd
+5c7490b33d0ae200d8044bf5e7f221da *man/nparms.Rd
+4f8d09f57f3bf31970e2d73814caa1d1 *man/pseudostudy1.Rd
+50bd5a4c486ad3a3a202ebd14fbaa9de *man/pseudostudy2.Rd
