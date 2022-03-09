@@ -4,9 +4,11 @@
 \name{pseudostudy2}
 \alias{pseudostudy2}
 \title{pseudostudy dataset 2}
-\format{pseudostudy consists of 107 cases (rows) and 5 variables where
+\format{
+pseudostudy consists of 107 cases (rows) and 5 variables where
 'treatment'('age') is considered to be the explanatory factor 'A'('B') and
-the variables resp1, resp2. resp3 form the response vector.}
+the variables resp1, resp2. resp3 form the response vector.
+}
 \usage{
 data(pseudostudy2)
 }

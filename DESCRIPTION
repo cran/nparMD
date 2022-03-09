@@ -1,7 +1,7 @@
 Package: nparMD
 Type: Package
 Title: Nonparametric Analysis of Multivariate Data in Factorial Designs
-Version: 0.1.0
+Version: 0.2.1
 Depends: R (>= 3.1.0)
 Imports: matrixStats, matrixcalc, MASS, gtools, Formula, methods, stats
 Author: Maximilian Kiefel and Arne C. Bathke
@@ -17,8 +17,9 @@ Description: Analysis of multivariate data with two-way completely randomized
     Munzel and Brunner (2000) <doi:10.1016/S0378-3758(99)00212-8>.
 License: GPL-2 | GPL-3
 Encoding: UTF-8
-RoxygenNote: 6.0.1
+LazyData: true
+RoxygenNote: 7.1.2
 NeedsCompilation: no
-Packaged: 2018-06-11 13:57:59 UTC; Maxi
+Packaged: 2022-03-09 07:44:58 UTC; mk
 Repository: CRAN
-Date/Publication: 2018-06-14 18:33:00 UTC
+Date/Publication: 2022-03-09 10:40:02 UTC

@@ -18,9 +18,10 @@ and groupsize per factor level combination.
 \description{
 Analysis of multivariate data with two-way completely randomized
 factorial design - version for large samples. The analysis is based on fully nonparametric, rank-based methods and
-uses an F-approximation for 'Dempster's ANOVA' criterion and a chisquare-approximation for 'Lawley-Hotelling's'
-criterion. This approximations are given by the asymtotic distribution
-of these statistics under true null-hypothesis. In contrast to the normal-approximated test (nrbtest2) it is designed for
+uses an F-approximation for 'Dempster's ANOVA' and a chisquare-approximation for the criteria called 'Wilks Lambda', 'Lawley-Hotelling' and
+'Bartlett-Nanda-Pillai'.
+These approximations are given by the asymtotic distribution
+of these statistics under true null-hypothesis. In contrast to the normal-approximated test (as used in the small sample version) it is designed for
 data with large samples (see details) while the number of factorial levels is allowed to be small. The multivariate response is allowed to be ordinal, quantitative, binary or a mixture
 of the different variable types. The test statistics are constructed using nonparametric relative effect estimators.
 }
@@ -35,6 +36,12 @@ data(pseudostudy1)
 nparml(resp1|resp2|resp3~treatment*age, pseudostudy1)
 }
 \references{
+Kiefel M., Bathke A.C. (2020)
+Rank-Based Analysis of Multivariate Data in Factorial Designs and Its Implementation in R
+In: Nonparametric Statistics (285-294)
+Springer Proceedings in Mathematics & Statistics
+Springer International Publishing, Cham
+
 Bathke A.C., Harrar S.W. (2016)
 Rank-Based Inference for Multivariate Data in Factorial Designs.
 In: Liu R., McKean J. (eds) Robust Rank-Based and Nonparametric Methods.

@@ -19,14 +19,15 @@ and groupsize per factor level combination.
 Analysis of multivariate data with two-way completely randomized
 factorial design - version for small samples. The analysis is based on fully nonparametric, rank-based methods and
 uses a N(0,1)-approximation for test statistics based on 'Dempster's ANOVA', 'Wilk's Lambda', 'Lawley-Hotelling' and
-'Bartlett-Nanda-Pillai' criterion. This approximation is established by the asymptotic distribution
+'Bartlett-Nanda-Pillai' criteria. This approximation is established by the asymptotic distribution
 of these four statistics under true null-hypothesis if one of the explanatory factors has a large number
 of levels. The multivariate response is allowed to be ordinal, quantitative, binary or a mixture
 of the different variable types. The test statistics are constructed using nonparametric relative effect estimators.
 }
 \details{
 This method is only implemented for complete data sets without missing values. The data is analysed for main effects
-and interaction effect of the explanatory factors. In each case the null hypothesis "no effect" is testet. The covariance matrix
+and interaction effect of the explanatory factors. In each case the null hypothesis "no effect" is testet. The explanatory factor 
+that has the higher number of levels is automatically designated as factor "A". The covariance matrix
 estimation requires at least 4 observations (observation vectors) per factor level combination. As the estimation is very time-consuming
 for large groups it is performed wih a random selection of observations when a group exceeds a size of 6 observation vectors.
 }
@@ -35,6 +36,12 @@ data(pseudostudy2)
 nparms(resp1|resp2|resp3~treatment*age, pseudostudy2)
 }
 \references{
+Kiefel M., Bathke A.C. (2020)
+Rank-Based Analysis of Multivariate Data in Factorial Designs and Its Implementation in R
+In: Nonparametric Statistics (285-294)
+Springer Proceedings in Mathematics & Statistics
+Springer International Publishing, Cham
+
 Bathke A.C., Harrar S.W. (2016)
 Rank-Based Inference for Multivariate Data in Factorial Designs.
 In: Liu R., McKean J. (eds) Robust Rank-Based and Nonparametric Methods.
