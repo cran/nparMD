@@ -18,6 +18,16 @@
 #' and interaction effect of the explanatory factors. In each case the null hypothesis "no effect" is testet. In order to obtain
 #' reliable results the considered data should include at least 7 observations per factor level combination.
 #' This method is only implemented for complete data sets without missing values.
+#' @references 
+#' Kiefel M., Freidl J. (2024)
+#' Nonparametric Analysis of Multivariate Data in Factorial Designs with Nondetects: A Case Study with Microbiome Data
+#' In: Journal of Agricultural, Biological, and Environmental Statistics
+#' https://doi.org/10.1007/s13253-024-00671-5.
+#' @references
+#' Kiefel M., Bathke A.C. (2022)
+#' Fully Nonparametric Methods for Multivariate Data in Factorial Designs. Asymptotics, Finite Sample Approximations, and Implementation in R
+#' In: Open Statistics, vol. 3, 2022, p. 74
+#' https://doi.org/10.1515/stat-2022-0112
 #' @references
 #' Kiefel M., Bathke A.C. (2020)
 #' Rank-Based Analysis of Multivariate Data in Factorial Designs and Its Implementation in R
@@ -56,7 +66,7 @@ nparml<-function(formula, data){
   if(!is(formula, "formula")){stop("Please give a formula")}
 
   formel<-Formula(formula)
-  data<-model.frame(Formula(formula),data)
+  data<-model.frame(formel,data)
 
   p<-ncol(data)-2
   N<-nrow(data)
@@ -76,27 +86,10 @@ nparml<-function(formula, data){
   b<-ncol(struc)
   groups<-as.vector(t(struc))
 
-
   data<-t(data[c(-(p+2),-(p+1))])
-
-  RT<-(rowRanks(data,ties.method="average")-0.5)/N		#RankTransform matrix pxN
-
-
-  #### Data grouping and means	####
-
-  rcl<-c(0,cumsum(groups))                     #replication-group column-index list
-  RTlist<-lapply(c(1:(a*b)),function(x){     #List of a*b matrices while each list-element represents
-    RT[,(rcl[x]+1):rcl[x+1]]                 #one replication group
-  })
-
-  meanRijList<-lapply(RTlist,rowMeans)						#row means R(bar)_ij
-  meanRij<-do.call(cbind,meanRijList)						#matrix of row means
-
-  Rtilde_i<-t(matrix(colMeans(matrix(t(meanRij),b)),a))			#sample mean over all b (a columns)
-  Rtilde_j<-matrix(rowMeans(matrix(meanRij,b*p)),p)			#sample mean over all a (b columns)
-
-  Rtilde<-rowMeans(meanRij)							#sample mean over a and b
-
+  
+  #RankTransform matrix pxN
+  RT<-(rowRanks(data,ties.method="average")-0.5)/N		
 
   # Contrast Matrices
 
@@ -111,26 +104,54 @@ nparml<-function(formula, data){
   T.B<-kronecker( C.B, diag(p))
   T.AB<-kronecker(C.AB, diag(p))
 
+  #### Data grouping and means	####
+  
+  #group (column) index 
+  rcl<-c(0,cumsum(groups))
+  
+  #Groups as list
+  RTlist<-lapply(c(1:(a*b)),function(x){     
+    RT[,(rcl[x]+1):rcl[x+1]]                 
+  })
+  
+  #cell (group) means 
+  meanRijList<-lapply(RTlist,rowMeans)						
+  meanRij<-do.call(cbind,meanRijList)						
+  
+  #pooled sample mean w.r.t. factor b (a columns)
+  Rtilde_i<-t(matrix(colMeans(matrix(t(meanRij),b)),a))	
+  #pooled sample mean w.r.t. factor a (b columns)
+  Rtilde_j<-matrix(rowMeans(matrix(meanRij,b*p)),p)			
+  
+  #(total) pooled sample mean
+  Rtilde<-rowMeans(meanRij)							
+
+
+
+
 
   ####	Dispersion Matrix	####
 
-  Deviations<-mapply("-",RTlist,meanRijList,SIMPLIFY = FALSE)					# (R_ijk - Rbar_ij)
-  Cproducts<-lapply(Deviations, tcrossprod)					# (R_ijk - Rbar_ij)(R_ijk - Rbar_ij)'
+  #cell wise (group-wise) deviations from mean
+  Deviations<-mapply("-",RTlist,meanRijList,SIMPLIFY = FALSE)		
+  #squared deviations
+  Cproducts<-lapply(Deviations, tcrossprod)					
 
-  nList<-as.list(1/(groups-1))			#
-  nList2<-as.list(1/(groups))       # factors for sum in G
+  nList<-as.list(1/(groups-1))
+  
+  # factors for sum in G
+  nList2<-as.list(1/(groups))       
 
 
-  Sij<-mapply("*",Cproducts,nList,SIMPLIFY=FALSE)				# S_ij
+  Sij<-mapply("*",Cproducts,nList,SIMPLIFY=FALSE)				
 
-  Sij.by.nij<-(mapply("*",Sij,nList2,SIMPLIFY=FALSE))             # Sij by nij
+  Sij.by.nij<-(mapply("*",Sij,nList2,SIMPLIFY=FALSE))             
 
   G<-(Reduce("+",Sij.by.nij))/(a*b)	# G
 
-  VhatN<-N*Reduce("+",mapply(kronecker,lapply(c(1:(a*b)),function(i){     #Matrix V^hat_N
-    diag(diag(1,(a*b))[,i])                                               #direct sum via kronecker product
+  VhatN<-N*Reduce("+",mapply(kronecker,lapply(c(1:(a*b)),function(i){     
+    diag(diag(1,(a*b))[,i])                                               
   }),Sij.by.nij,SIMPLIFY = FALSE))
-
 
 
   ####  H  ####
@@ -149,30 +170,22 @@ nparml<-function(formula, data){
   H<-list(HA,HB,HAB)
 
 
-
-
   #### estimated d.o.f. ####
 
-  fhat.A<-((a-1)^2*(matrix.trace(VhatN))^2)/((a*b)^2*matrix.trace(T.A%*%VhatN%*%T.A%*%VhatN))
+  fhat.A <- ((a-1)^2*(matrix.trace(VhatN))^2)/((a*b)^2*matrix.trace(T.A%*%VhatN%*%T.A%*%VhatN))
 
-  fhat.B<-((b-1)^2*(matrix.trace(VhatN))^2)/((a*b)^2*matrix.trace(T.B%*%VhatN%*%T.B%*%VhatN))
+  fhat.B <- ((b-1)^2*(matrix.trace(VhatN))^2)/((a*b)^2*matrix.trace(T.B%*%VhatN%*%T.B%*%VhatN))
 
-  fhat.AB<-((a-1)^2*(b-1)^2*(matrix.trace(VhatN))^2)/((a*b)^2*matrix.trace(T.AB%*%VhatN%*%T.AB%*%VhatN))
+  fhat.AB <- ((a-1)^2*(b-1)^2*(matrix.trace(VhatN))^2)/((a*b)^2*matrix.trace(T.AB%*%VhatN%*%T.AB%*%VhatN))
 
-  fhat<-c(fhat.A,fhat.B,fhat.AB)
+  fhat <- c(fhat.A,fhat.B,fhat.AB)
 
-  fhat.0<-(matrix.trace(VhatN))^2/(((sapply(Sij.by.nij,matrix.trace))^2)%*%unlist(nList))
-
-  LAMBDA <- as.matrix(kronecker(C.AB, ginv(G) ) %*% VhatN/N)
-
-  f <- (matrix.trace(LAMBDA)^2)/(matrix.trace(LAMBDA %*% LAMBDA))
-  g <- (matrix.trace(LAMBDA %*% LAMBDA))/(matrix.trace(LAMBDA))
-
+  fhat.0 <- (matrix.trace(VhatN))^2/(((sapply(Sij.by.nij,matrix.trace))^2)%*%unlist(nList))
 
 
   ####  Test Statistics ####
 
-  TraceG<-matrix.trace(G)
+  TraceG <- matrix.trace(G)
   m <- c((a-1),(b-1),(a-1)*(b-1))
 
   Results<-lapply(c(MainEffectA=1,MainEffectB=2,Interaction=3),function(i){
@@ -184,25 +197,13 @@ nparml<-function(formula, data){
 
     test.values<-c(D.Anova, LR, LH, BNP)
 
-    if(i == 3){
-      p.values <- 1-c(pf(D.Anova,fhat[i],fhat.0),pchisq(LR/g,f),pchisq(LH/g,f),pchisq(BNP/g,f))
-      df <- c(fhat[i],f,f,f)
-      Rnames <- c("Dempster's ANOVA (F-approximation with df2='inf')",
-                  paste0("Wilks Lambda (",round(g,2),"*Chi^2 approximation)"),
-                  paste0("Lawley-Hotelling-Criterion (",round(g,2),"*Chi^2 approximation)"),
-                  paste0("Bartlett-Nanda-Pillai Criterion (",round(g,2),"*Chi^2 approximation)"))
-
-    } else {
       p.values <- 1-c(pf(D.Anova,fhat[i],fhat.0),pchisq(LR,m[i]*p),pchisq(LH,m[i]*p),pchisq(BNP,m[i]*p))
       df <- c(fhat[i],m[i]*p,m[i]*p,m[i]*p)
       Rnames <- c("Dempster's ANOVA (F-approximation with df2='inf')",
                   "Wilks Lambda (Chi^2 approximation)",
                   "Lawley-Hotelling-Criterion (Chi^2 approximation)",
                   "Bartlett-Nanda-Pillai Criterion (Chi^2 approximation)")
-    }
-
-
-
+      
     data.frame("Test Statistic"=test.values,
                "p value"=p.values,"df1"=df,
                row.names = Rnames

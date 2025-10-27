@@ -36,6 +36,16 @@ data(pseudostudy1)
 nparml(resp1|resp2|resp3~treatment*age, pseudostudy1)
 }
 \references{
+Kiefel M., Freidl J. (2024)
+Nonparametric Analysis of Multivariate Data in Factorial Designs with Nondetects: A Case Study with Microbiome Data
+In: Journal of Agricultural, Biological, and Environmental Statistics
+https://doi.org/10.1007/s13253-024-00671-5.
+
+Kiefel M., Bathke A.C. (2022)
+Fully Nonparametric Methods for Multivariate Data in Factorial Designs. Asymptotics, Finite Sample Approximations, and Implementation in R
+In: Open Statistics, vol. 3, 2022, p. 74
+https://doi.org/10.1515/stat-2022-0112
+
 Kiefel M., Bathke A.C. (2020)
 Rank-Based Analysis of Multivariate Data in Factorial Designs and Its Implementation in R
 In: Nonparametric Statistics (285-294)

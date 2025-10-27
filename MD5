@@ -1,12 +1,12 @@
-5c856031b3fe6b59d729ef3d29cd1e82 *DESCRIPTION
+70fd36b1c72389cb511d19406e62d1f6 *DESCRIPTION
 410df6401eda2f041a0fd59b27dbe1be *NAMESPACE
-13e00deef201abf602dba1733446dbd8 *R/nparml.R
-8eb107c47f57d44625d5a5932632faae *R/nparms.R
+eeb2944bd7536205bb250e17eb235ca4 *R/nparml.R
+beb9513dd2cdd366b15914c55aabf9eb *R/nparms.R
 c0878cda19d46df3e67d1450e39b82c8 *R/pseudostudy1.R
 3f8b5534b58848243cd2ac7cd29a145e *R/pseudostudy2.R
 e6baa018e527ed087d252693b897fd4a *data/pseudostudy1.rda
 fa52f79fb2978fe7d9cf83ddb34db693 *data/pseudostudy2.rda
-573408e7e2f414aa980117163765ff64 *man/nparml.Rd
-aede404bea30136000092c456563d837 *man/nparms.Rd
+f0557a23f79bd4821db258bcd341c4ab *man/nparml.Rd
+1b8f2b4d84521bb200ffc86c35ed01ff *man/nparms.Rd
 2a40ae90e59aa7ffb239efb219d67327 *man/pseudostudy1.Rd
 d4a8bb23984b7e2aa5a9871e73657995 *man/pseudostudy2.Rd

@@ -17,6 +17,16 @@
 #' that has the higher number of levels is automatically designated as factor "A". The covariance matrix
 #' estimation requires at least 4 observations (observation vectors) per factor level combination. As the estimation is very time-consuming
 #' for large groups it is performed wih a random selection of observations when a group exceeds a size of 6 observation vectors. 
+#' @references 
+#' Kiefel M., Freidl J. (2024)
+#' Nonparametric Analysis of Multivariate Data in Factorial Designs with Nondetects: A Case Study with Microbiome Data
+#' In: Journal of Agricultural, Biological, and Environmental Statistics
+#' https://doi.org/10.1007/s13253-024-00671-5.
+#' @references
+#' Kiefel M., Bathke A.C. (2022)
+#' Fully Nonparametric Methods for Multivariate Data in Factorial Designs. Asymptotics, Finite Sample Approximations, and Implementation in R
+#' In: Open Statistics, vol. 3, 2022, p. 74
+#' https://doi.org/10.1515/stat-2022-0112
 #' @references
 #' Kiefel M., Bathke A.C. (2020)
 #' Rank-Based Analysis of Multivariate Data in Factorial Designs and Its Implementation in R
@@ -77,28 +87,32 @@ nparms<-function(formula, data){
 
 
   data<-t(data[c(-(p+2),-(p+1))])
-
-  RT<-(rowRanks(data,ties.method="average")-0.5)/N		#RankTransform matrix pxN
+  
+  #RankTransform matrix pxN
+  RT<-(rowRanks(data,ties.method="average")-0.5)/N		
 
 
   #### Data grouping and means	####
 
-  rcl<-c(0,cumsum(groups))                     #replication-group column-index list
-
-  RTlist<-lapply(c(1:(a*b)),function(x){     #List of a*b matrices while
-    #each list-element represents
-    RT[,(rcl[x]+1):rcl[x+1]]                 #one replication group
-
+  #group (column) index 
+  rcl<-c(0,cumsum(groups))                     
+  
+  #Groups as list
+  RTlist<-lapply(c(1:(a*b)),function(x){     
+    RT[,(rcl[x]+1):rcl[x+1]]                 
   })
-
-  meanRijList<-lapply(RTlist,rowMeans)						#row means R(bar)_ij
-  meanRij<-do.call(cbind,meanRijList)						#matrix of row means
-
-  Rtilde_i<-t(matrix(colMeans(matrix(t(meanRij),b)),a))			#sample mean over all b (a columns)
-  Rtilde_j<-matrix(rowMeans(matrix(meanRij,b*p)),p)			#sample mean over all a (b columns)
-
-  Rtilde<-rowMeans(meanRij)							#sample mean over a and b
-
+  
+  #cell (group) means 
+  meanRijList<-lapply(RTlist,rowMeans)						
+  meanRij<-do.call(cbind,meanRijList)						
+  
+  #pooled sample mean w.r.t. factor b (a columns)
+  Rtilde_i<-t(matrix(colMeans(matrix(t(meanRij),b)),a))			
+  #pooled sample mean w.r.t. factor a (b columns)
+  Rtilde_j<-matrix(rowMeans(matrix(meanRij,b*p)),p)			
+  
+  #(total) pooled sample mean
+  Rtilde<-rowMeans(meanRij)							
 
   # Contrast Matrices
 
@@ -106,24 +120,26 @@ nparms<-function(formula, data){
   C.B <- kronecker((rep(1,a) %*% t(rep(1,a)))/a, P.b)
   T.B<-kronecker( C.B, diag(p))
 
-
   ####	Dispersion Matrix	####
 
-  Deviations<-mapply("-",RTlist,meanRijList,SIMPLIFY = FALSE)					# (R_ijk - Rbar_ij)
-  Cproducts<-lapply(Deviations, tcrossprod)					# (R_ijk - Rbar_ij)(R_ijk - Rbar_ij)'
+  #cell wise (group-wise) deviations from mean
+  Deviations<-mapply("-",RTlist,meanRijList,SIMPLIFY = FALSE)	
+  #squared deviations
+  Cproducts<-lapply(Deviations, tcrossprod)					
 
-  nList<-as.list(1/(groups-1))			#
-  nList2<-as.list(1/(groups))       # factors for sum in G
+  nList<-as.list(1/(groups-1))	
+  # factors for sum in G
+  nList2<-as.list(1/(groups))       
 
 
-  Sij<-mapply("*",Cproducts,nList,SIMPLIFY=FALSE)				# S_ij
+  Sij<-mapply("*",Cproducts,nList,SIMPLIFY=FALSE)		
 
-  Sij.by.nij<-(mapply("*",Sij,nList2,SIMPLIFY=FALSE))             # Sij by nij
+  Sij.by.nij<-(mapply("*",Sij,nList2,SIMPLIFY=FALSE))   
 
   G<-(Reduce("+",Sij.by.nij))/(a*b)	# G
 
-  VhatN<-N*Reduce("+",mapply(kronecker,lapply(c(1:(a*b)),function(i){     #Matrix V^hat_N
-    diag(diag(1,(a*b))[,i])                                               #direct sum via kronecker product
+  VhatN<-N*Reduce("+",mapply(kronecker,lapply(c(1:(a*b)),function(i){   
+    diag(diag(1,(a*b))[,i])                                              
   }),Sij.by.nij,SIMPLIFY = FALSE))
 
 
@@ -132,7 +148,6 @@ nparms<-function(formula, data){
     HA<-b*(tcrossprod((Rtilde_i)-(Rtilde)))/(a-1)
 
     HB<-a*(tcrossprod((Rtilde_j)-(Rtilde)))/(b-1)
-
 
     HAB<-(1/((a-1)*(b-1)))*(tcrossprod(
       meanRij
@@ -158,7 +173,8 @@ nparms<-function(formula, data){
 
   ####	Quadruples and PSIijOMEGA	####
 
-  Quadruples<-lapply(c(1:(a*b)),function(x){				#Set of all quadruples
+  #Set of all quadruples
+  Quadruples<-lapply(c(1:(a*b)),function(x){				
 
     #Randomization here - in case of large groups
     #check if groupsize is greater than 6 - then take random selection of
@@ -170,8 +186,6 @@ nparms<-function(formula, data){
     AllQuads[QuadSample,]
   }
     else {permutations(groups[x],4)}
-
-    #List structure according to groups
 
   })
 
@@ -203,7 +217,8 @@ nparms<-function(formula, data){
 
   PsiOMEGA2ij<-lapply(c(1:(a*b)),function(rGroup){
 
-    Qparts<-lapply(c(1:(nrow(Quadruples[[rGroup]]))),function(x){	#Summanden eines PSIij(Omega)
+    #Parts of Psi_ij(Omega)
+    Qparts<-lapply(c(1:(nrow(Quadruples[[rGroup]]))),function(x){	
 
       k1<-Quadruples[[rGroup]][x,1]
       k2<-Quadruples[[rGroup]][x,2]
@@ -225,11 +240,8 @@ nparms<-function(formula, data){
 
   ####  nyOMEGA ####
 
-
   ny1OMEGA<-sum(sapply(PsiOMEGAij,matrix.trace)/(groups*(groups-1)))/(a*b)
-
   ny1OMEGA2<-sum(sapply(PsiOMEGA2ij,matrix.trace)/(groups*(groups-1)))/(a*b)
-
 
   Indexj<-permutations(b,2)
 
@@ -281,16 +293,12 @@ nparms<-function(formula, data){
 
   tau<-list(c(tauA,tauA2),c(tauAB,tauAB2))
 
-
   ####  Test Statistics ####
 
   TraceG<-matrix.trace(G)
   m <- c((a-1),(a-1)*(b-1),(b-1))
 
-
   Results<-lapply(c(MainEffectA=1, Interaction=2, MainEffectB=3),function(i){
-
-
 
     if(i == 3){
 
